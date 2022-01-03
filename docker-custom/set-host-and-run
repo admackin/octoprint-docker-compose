@@ -1,0 +1,27 @@
+#!/bin/sh
+
+if [ -n "$PRIMARY_INTERFACE" ]; then
+	listen_address=$(ip -4 -br addr show | grep -E "^$PRIMARY_INTERFACE" | awk '{print $3}' | cut -d / -f 1)
+	if [ $listen_address ] ; then
+		echo "detected address for interface '$PRIMARY_INTERFACE' as '$listen_address'."
+		echo "setting octoprint to only listen on '$listen_address'."
+		octoprint config set server.host "$listen_address"
+	else
+		echo "Couldn't detect address for interface '$PRIMARY_INTERFACE'."
+		echo "Service discovery may not function correctly."
+	fi
+else
+	echo "WARNING: No value found in PRIMARY_INTERFACE environment variable."
+	echo "Set this environment variable to the name of a network device"
+	echo "on your Docker container (which should match one on your host "
+	echo "if running with the recommended 'network_mode: host' setting.),"
+	echo "as returned by the `ip addr show` command, such as 'wlan0' or 'eth0'."
+	echo "This is used to tell octoprint to only listen on a particular"
+	echo "interface which ensures that service discovery works correctly,"
+	echo "by using a valid IP address."
+	echo
+	echo "If you don't set this up, Octoprint will still work but "
+	echo "service discovery may not function correctly. "
+fi
+
+$@

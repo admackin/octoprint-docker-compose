@@ -1,0 +1,15 @@
+version: '2.4'
+
+services:
+  octoprint:
+    build: docker-custom
+    restart: always
+    network_mode: host
+    privileged: true # avoid needing to work out USB devices
+    environment:
+      - PRIMARY_INTERFACE # set in .env to allow helpers to determine primary IP
+    volumes:
+     - octoprint:/octoprint
+  
+volumes:
+  octoprint:
